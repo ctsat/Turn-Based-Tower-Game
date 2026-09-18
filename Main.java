@@ -34,5 +34,10 @@ public class Main {
 
     different visuals??
     
+    player will have 4 actions
+       attack
+       analyze
+       item
+       flee
 
 */
