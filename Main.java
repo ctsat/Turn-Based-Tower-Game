@@ -3,9 +3,21 @@ import javax.swing.*;
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Window window = new Window();
 
+
+    static boolean keepPlaying = true;
+
+
+
+
+    public static void main(String[] args) {
+
+        while (keepPlaying) {
+            
+
+
+        }
+        
     }
 }
 

@@ -1,6 +1,6 @@
 public class Monster {
     private double health;
     private String name;
-    private int damage;
-    
+    private int attack;
+
 }
