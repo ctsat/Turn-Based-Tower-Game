@@ -1,21 +1,45 @@
 import java.util.*;
 
-public class player {
+public class Player {
     private double health;
+    private double maxHealth;
     private String name;
     private int strength;
     
     private static Scanner scanner = new Scanner(System.in);
-
-    public player(String name, int health, int strength) {
+    
+    public Player(String name) {
         this.name = name;
-        this.health = health;
+        this.health = 20.0;
+        this.strength = 2;
+        this.maxHealth = 20.0;
+    }
+
+    public Player(String name, int maxHealth, int strength) {
+        this.name = name;
+        this.health = maxHealth;
+        this.maxHealth = maxHealth;
         this.strength = strength;
     }
-    public player(String name) {
-        this.name = name;
-        health = 20;
-        strength = 2;
+
+    public void rest(double heal) {
+        this.health += heal * (1.0 / Main.difficulty);
+        if (this.health > this.maxHealth) {
+            this.health = this.maxHealth;
+        }
+    }
+
+    public void trainHealth(double amount) {
+        this.maxHealth += amount;
+        this.health += amount * (1.0 / Main.difficulty);
+    }
+
+    public void trainAttack(int amount) {
+        this.strength += amount;
+    }
+
+    public double healthPercent() { 
+        return (double) this.health / this.maxHealth; 
     }
 
     public static void restart() {
@@ -27,19 +51,27 @@ public class player {
         }
     }
 
-    public boolean isAlive() {
-        return this.health > 0;
+    public boolean isAlive() { 
+        return this.health > 0; 
     }
 
     public void takeDmg(double pain) {
         this.health -= pain;
-        if (!(this.isAlive())) {
-            System.out.println( "Game Over </3");
+        if (this.health < 0) {
+            this.health = 0;
+        }
+        if (!this.isAlive()) {
+            System.out.println("Game Over </3");
             restart();
         }
-
-
-
     }
 
+    public String getName() { return name; }
+    public double getHealth() { return health; }
+    public double getMaxHealth() { return maxHealth; }
+    public int getStrength() { return strength; }
+
+    public void setHealth(double health) { this.health = health; }
+    public void setMaxHealth(double maxHealth) { this.maxHealth = maxHealth; }
+    public void setStrength(int strength) { this.strength = strength; }
 }

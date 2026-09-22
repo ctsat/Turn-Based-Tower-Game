@@ -6,7 +6,8 @@ public class Main {
 
 
     static boolean keepPlaying = true;
-
+    static double difficulty = 1.0;
+    Scanner scanner = new Scanner(System.in);
 
 
 
