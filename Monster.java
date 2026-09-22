@@ -13,6 +13,10 @@ public class Monster {
         this.exp = exp * Main.difficulty * 0.85;
     }
 
+    public String monsterStats() {
+        return String.format("Monster %s HP: %.1f/%.1f | ATK: %d", this.name, this.health, this.maxHealth, this.attack);
+    }
+
     public void takeDmg(double pain) {
         this.health -= pain;
         if (this.health < 0) {

@@ -11,7 +11,7 @@ public class Player {
     public Player(String name) {
         this.name = name;
         this.health = 20.0;
-        this.strength = 2;
+        this.strength = 3;
         this.maxHealth = 20.0;
     }
 
@@ -31,7 +31,9 @@ public class Player {
 
     public void trainHealth(double amount) {
         this.maxHealth += amount;
-        this.health += amount * (1.0 / Main.difficulty);
+        this.health += amount * (1.0 / (Main.difficulty+0.5));
+        if (this.health>this.maxHealth)
+            this.health = this.maxHealth;
     }
 
     public void trainAttack(int amount) {
@@ -70,6 +72,11 @@ public class Player {
     public double getHealth() { return health; }
     public double getMaxHealth() { return maxHealth; }
     public int getStrength() { return strength; }
+
+    public String playerStats() {
+        return String.format("Player %s HP: %f/%f | ATK: %d", this.name, this.health, this.maxHealth, this.strength);
+    }
+
 
     public void setHealth(double health) { this.health = health; }
     public void setMaxHealth(double maxHealth) { this.maxHealth = maxHealth; }
