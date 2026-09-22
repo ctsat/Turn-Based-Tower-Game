@@ -65,7 +65,7 @@ public class Main {
                 boolean fled = false;
                 while (monster.isAlive() && player.isAlive() && !fled && keepPlaying) {
                     System.out.println("\n--- COMBAT vs " + monster.getName() + " ---");
-                    System.out.println(player.playerStats() + " | " + monster.monsterStats());
+                    System.out.println(player.playerStats() + " | " + monster.getName());
 
                     System.out.println("1. Attack");
                     System.out.println("2. Analyze");
@@ -85,10 +85,24 @@ public class Main {
                     } else if (combatChoice == 2) {
                         System.out.println("[ANALYZE] " + player.playerStats() + String.format(" (%.1f%% HP)", player.healthPercent() * 100.0));
                         System.out.println("[ANALYZE] " + monster.monsterStats() + String.format(" | EXP Value: %.1f", monster.getExp()));
+                       
+                        if (monster.isAlive()) {
+                            player.takeDmg(monster.getAttack());
+                            System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
+                        }
+                        
                     } else if (combatChoice == 3) {
-                        System.out.println(player.getName() + " fled down the stairs!");
-                        fled = true;
-                        level--;
+                        if (Math.random() < 0.66) {
+                            System.out.println(player.getName() + " successfully fled down the stairs!");
+                            fled = true;
+                            level--;
+                        } else {
+                            System.out.println(player.getName() + " failed to flee!");
+                            if (monster.isAlive()) {
+                                player.takeDmg(monster.getAttack());
+                                System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
+                            }
+                        }
                     }
                 }
 

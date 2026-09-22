@@ -50,6 +50,7 @@ public class Player {
         if (!response.equalsIgnoreCase("yes")) {
             Main.keepPlaying = false;
             System.out.println("Thanks for playing!");
+            break;
         }
     }
 
@@ -74,7 +75,7 @@ public class Player {
     public int getStrength() { return strength; }
 
     public String playerStats() {
-        return String.format("Player %s HP: %f/%f | ATK: %d", this.name, this.health, this.maxHealth, this.strength);
+        return String.format("Player %s HP: %.1f/%.1f | ATK: %d", this.name, this.health, this.maxHealth, this.strength);
     }
 
 
