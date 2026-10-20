@@ -1,5 +1,3 @@
-import java.util.*;
-
 // Represents the player character and manages player stats like health and attack
 public class Player {
     // Private instance variables to store player data safely
@@ -8,10 +6,7 @@ public class Player {
     private String name;
     private int strength;
     
-    // Static scanner used across player methods for user input
-    private static Scanner scanner = new Scanner(System.in);
-    
-    // Default constructor to make a player with default starting stats
+
     public Player(String name) {
         this.name = name;
         this.health = 20.0;
@@ -53,30 +48,17 @@ public class Player {
         return (double) this.health / this.maxHealth; 
     }
 
-    // Asks player if they want to play again when game ends
-    public static void restart() {
-        System.out.print("Would you like to play again? (yes/no): ");
-        String response = scanner.nextLine();
-        if (!response.equalsIgnoreCase("yes")) {
-            Main.keepPlaying = false;
-            System.out.println("Thanks for playing!");
-        }
-    }
-
     // Checks if player health is greater than 0
     public boolean isAlive() { 
         return this.health > 0; 
     }
 
-    // Subtracts damage from health and checks if game over is triggered
+    // Subtracts damage from health, making sure health stays at or above 0.
+    // Game over is handled in Main so this method only changes the player's state.
     public void takeDmg(double pain) {
         this.health -= pain;
         if (this.health < 0) {
             this.health = 0;
-        }
-        if (!this.isAlive()) {
-            System.out.println("Game Over </3");
-            restart();
         }
     }
 

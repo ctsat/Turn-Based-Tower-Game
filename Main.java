@@ -124,7 +124,6 @@ public class Main {
                     } else if (combatChoice == 2) {
                         System.out.println("[ANALYZE] " + player.playerStats() + String.format(" (%.1f%% HP)", player.healthPercent() * 100.0));
                         System.out.println("[ANALYZE] " + monster.monsterStats() + String.format(" | EXP Value: %.1f", monster.getExp()));
-                       
 
                         if (monster.isAlive()) {
                             player.takeDmg(monster.getAttack());
