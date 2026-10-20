@@ -1,5 +1,6 @@
 import java.util.*;
 
+
 public class Main {
 
     // Class variables for overall game status and difficulty multiplier
@@ -23,17 +24,35 @@ public class Main {
              return new Monster("Zenon", 1000.0, 2, 9999.99);
     }
     
-    //Makes sure scanner doesnt error when getting incorrect values
+    // Makes sure scanner doesn't error when getting incorrect values
     public static int getValidInt(Scanner scanner, String prompt) {
-    while (true) {
-        System.out.print(prompt);
-        try {
-            return Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input! Please enter a whole number.");
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input! Please enter a whole number.");
+            }
         }
     }
-}
+
+    // Overloaded version keeps asking until the number is between min and max (inclusive),
+    public static int getValidInt(Scanner scanner, String prompt, int min, int max) {
+        while (true) {
+            int value = getValidInt(scanner, prompt);
+            if (value >= min && value <= max) {
+                return value;
+            }
+            System.out.println("Please enter a number from " + min + " to " + max + ".");
+        }
+    }
+
+    // Asks if the user wants to play again, using main's Scanner (only one Scanner on System.in)
+    public static boolean askPlayAgain(Scanner scanner) {
+        System.out.print("Would you like to play again? (yes/no): ");
+        String response = scanner.nextLine().trim();
+        return response.equalsIgnoreCase("yes") || response.equalsIgnoreCase("y");
+    }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -53,7 +72,7 @@ public class Main {
             System.out.println("2. Normal (1.0x)");
             System.out.println("3. Hard (1.5x)");
             
-            int diffChoice = getValidInt(scanner, "Choice: ");
+            int diffChoice = getValidInt(scanner, "Choice: ", 1, 3);
 
             // Assigns difficulty modifier according to choice
             if (diffChoice == 1) {
@@ -89,7 +108,7 @@ public class Main {
                     System.out.println("2. Analyze");
                     System.out.println("3. Flee");
 
-                    int combatChoice = getValidInt(scanner, "Combat Choice: ");
+                    int combatChoice = getValidInt(scanner, "Combat Choice: ", 1, 3);
 
                     // Option 1: Player attacks monster; monster counterattacks if alive
                     if (combatChoice == 1) {
@@ -100,16 +119,18 @@ public class Main {
                             player.takeDmg(monster.getAttack());
                             System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
                         }
-                    // Option 2: Inspect stats; monster strikes back
+                    // Option 2: Inspect stats. Design choice: analyzing uses up a turn, so the
+                    // monster strikes back -- information has a cost, like a real turn-based battle
                     } else if (combatChoice == 2) {
                         System.out.println("[ANALYZE] " + player.playerStats() + String.format(" (%.1f%% HP)", player.healthPercent() * 100.0));
                         System.out.println("[ANALYZE] " + monster.monsterStats() + String.format(" | EXP Value: %.1f", monster.getExp()));
                        
+
                         if (monster.isAlive()) {
                             player.takeDmg(monster.getAttack());
                             System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
                         }
-                        
+
                     // Option 3: Attempt 66% chance flee; takes counterattack on failure
                     } else if (combatChoice == 3) {
                         if (Math.random() < 0.66) {
@@ -143,12 +164,12 @@ public class Main {
                         System.out.println("2. Rest Room");
                         System.out.println("3. Fight Room (Ascend)");
 
-                        int hubChoice = getValidInt(scanner, "Room Choice: ");
+                        int hubChoice = getValidInt(scanner, "Room Choice: ", 1, 3);
 
                         // Option 1: Train to boost Max HP or Attack
                         if (hubChoice == 1) {
                             System.out.println("  [1] +10 Max HP  |  [2] +3 Attack");
-                            int trainChoice = getValidInt(scanner, "  Select focus: ");
+                            int trainChoice = getValidInt(scanner, "  Select focus: ", 1, 2);
 
                             if (trainChoice == 1) {
                                 player.trainHealth(10.0);
@@ -172,43 +193,17 @@ public class Main {
                 }
             }
 
-            // Victory screen if all 5 levels cleared while alive
-            if (player.isAlive() && keepPlaying) {
+            // End-of-run screen: victory if all 5 levels cleared while alive, otherwise game over
+            if (player.isAlive()) {
                 System.out.println("\nCongratulations " + player.getName() + "! You cleared all 5 levels of the tower!");
-                Player.restart();
+            } else {
+                System.out.println("\nGame Over </3");
             }
 
+            // Play-again prompt now lives in Main and uses main's Scanner
+            keepPlaying = askPlayAgain(scanner);
         }
+        System.out.println("Thanks for playing!");
+        scanner.close();
     }
-/*
-    Turn based tower game
-    5 levels
-    1- weaker mosnerter
-    2- stronger 
-    3- stronger
-    4- stronger
-    5- boss
-
-    // 3 rooms types
-    forage
-    rest
-    fight
-
-    chance to have option not work or not find anything
-
-    -items would provide modifiers to the player 
-    -fighting should increase stats but should either be extremely difficult without items 
-        or you should need to fight in forageing and for stats (training and at end of training stats increase)
-
-    different weapons???
-
-    different visuals??
-    
-    player will have 4 actions
-       attack
-       analyze
-       item
-       flee
-
-*/
 }
