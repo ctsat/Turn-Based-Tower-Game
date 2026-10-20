@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.util.*;
 
 public class Main {
@@ -116,7 +115,7 @@ public class Main {
                         if (Math.random() < 0.66) {
                             System.out.println(player.getName() + " successfully fled down the stairs!");
                             fled = true;
-                            level--;
+                            level = Math.max(0, level - 2);
                         } else {
                             System.out.println(player.getName() + " failed to flee!");
                             if (monster.isAlive()) {
@@ -179,7 +178,6 @@ public class Main {
                 Player.restart();
             }
 
-            scanner.nextLine();
         }
     }
 /*

@@ -1,0 +1,17 @@
+AP CSA Project Reflection: Turn-Based Tower Game
+
+1. Standards Tracking
+1) Primitive types: Player and Monster use double health and int attack/strength; Main uses boolean keepPlaying and double difficulty.
+2) Arithmetic and casting: the Monster constructor casts (int) attack and scales exp by difficulty; Player.rest() uses +=; healthPercent() casts (double).
+3) Custom classes: Player (two overloaded constructors) and Monster have private fields, getters, and setters, and are instantiated in Main.
+4) Return methods: spawnMonsterForLevel(), getValidInt(), isAlive(), and healthPercent() results feed conditions and expressions.
+5) Compound logic: the combat loop condition and combatChoice if/else-if chain in main().
+6) Dynamic loops: while (keepPlaying) and the combat loop.
+7) Count-based loop: for (int level = 1; level <= 5; level++).
+8) Integration: break, continue, and level-- (fleeing) alter the level loop.
+
+2. Design Trade-offs
+Rather than hard-coding monster stats for each difficulty, I used one static multiplier, Main.difficulty. The Monster constructor scales health, attack, and EXP with it, while Player.rest() and trainHealth() scale healing inversely. This couples the classes, but difficulty can be tuned in one place.
+
+3. Debugging Analysis
+My hardest bug was a crash whenever a letter was typed at a menu. The stack trace pointed to a NumberFormatException from Integer.parseInt. I fixed it with getValidInt(), which wraps parseInt in try/catch inside a while(true) loop and re-prompts until the input is valid.
