@@ -15,3 +15,24 @@ Rather than hard-coding monster stats for each difficulty, I used one static mul
 
 3. Debugging Analysis
 My hardest bug was a crash whenever a letter was typed at a menu. The stack trace pointed to a NumberFormatException from Integer.parseInt. I fixed it with getValidInt(), which wraps parseInt in try/catch inside a while(true) loop and re-prompts until the input is valid.
+
+5. Design Trade-offs (Units 5–6)
+
+I made weapons work automatically instead of having to “equip” them. Player.getAttack() returns strength plus totalWeaponPower(inventory), 
+so any weapon in the Item[] array raises your attack. This kept the combat menu simple: only potions need a menu option (4. Drink Potion). 
+It also makes fleeing matter, because losing a random item can lower your attack. The downside is that the player can’t choose which weapon 
+to use, but with only 5 slots that didn’t seem necessary.
+
+I also kept Analyze as an action that uses a turn, even though it was flagged in my Unit 1–4 feedback. In a turn-based battle,
+information should cost something. Otherwise you would always Analyze first for free, and the option would stop being a choice.
+
+6. Debugging Analysis (Units 5–6)
+
+When I moved the monsters into a Monster[] floors array, fleeing broke. 
+Fleeing sends you down a floor, but the monster on that floor was already defeated,
+so the combat loop skipped straight to “Victory!” and gave free rest and training. 
+Before, spawnMonsterForLevel() made a brand-new monster every time,
+so this never happened. Now the same objects stay in the array and keep their health. 
+I fixed it by checking !monster.isAlive() when entering a floor and resetting its health with setHealth(getMaxHealth()).
+I also added a boolean[] cleared array so a revived monster doesn’t give EXP or item drops again, 
+which stops players from farming lower floors.

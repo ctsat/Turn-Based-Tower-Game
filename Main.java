@@ -18,7 +18,7 @@ public class Main {
         }
     }
 
-    // Overloaded version keeps asking until the number is between min and max (inclusive),
+    // Overloaded version that also checks the number is in range
     public static int getValidInt(Scanner scanner, String prompt, int min, int max) {
         while (true) {
             int value = getValidInt(scanner, prompt);
@@ -29,11 +29,59 @@ public class Main {
         }
     }
 
-    // Asks if the user wants to play again, using main's Scanner (only one Scanner on System.in)
+    // Asks if the user wants to play again
     public static boolean askPlayAgain(Scanner scanner) {
         System.out.print("Would you like to play again? (yes/no): ");
         String response = scanner.nextLine().trim();
         return response.equalsIgnoreCase("yes") || response.equalsIgnoreCase("y");
+    }
+
+    // Averages visited floors (static, only uses the array)
+    public static double averageVisited(int[] values) {
+        int sum = 0;
+        int count = 0;
+        for (int value : values) {
+            if (value > 0) {
+                sum += value;
+                count++;
+            }
+        }
+        if (count == 0) {
+            return 0.0;
+        }
+        return (double) sum / count;
+    }
+
+    // Returns the sum of an array (static, only uses the array)
+    public static double sum(double[] values) {
+        double total = 0.0;
+        for (double value : values) {
+            total += value;
+        }
+        return total;
+    }
+
+    // Prints the end-of-run report
+    public static void printRunReport(Player player, int[] turnsPerFloor, double[] damageTaken, double totalExp) {
+        System.out.println("\n=========== RUN REPORT ===========");
+        for (int i = 0; i < turnsPerFloor.length; i++) {
+            if (turnsPerFloor[i] > 0) {
+                System.out.println(String.format("Floor %d: %d turns, %.1f damage taken", i + 1, turnsPerFloor[i], damageTaken[i]));
+            }
+        }
+        System.out.println(String.format("Average turns per floor: %.1f", averageVisited(turnsPerFloor)));
+        System.out.println(String.format("Total damage taken: %.1f", sum(damageTaken)));
+        System.out.println(String.format("Score (EXP earned): %.1f", totalExp));
+        System.out.println("Final ATK: " + player.getAttack());
+        Item best = player.findStrongestWeapon();
+        if (best != null) {
+            System.out.println("Strongest weapon: " + best);
+        } else {
+            System.out.println("Strongest weapon: none");
+        }
+        System.out.println(player.inventoryString());
+        System.out.println("Items dropped (all games): " + Item.getItemsCreated());
+        System.out.println("==================================");
     }
 
     public static void main(String[] args) {
@@ -45,9 +93,6 @@ public class Main {
             System.out.println("======================== \nWelcome to the tower \nReach floor 5 \nGood Luck! \n======================= \nEnter player name:");
             String playerName = scanner.nextLine();
 
-            // Creates a new Player instance
-            Player player = new Player(playerName);
-
             // Prompts user for game difficulty selection
             System.out.println("\nSelect Difficulty(1-3):");
             System.out.println("1. Easy (0.5x)");
@@ -56,15 +101,20 @@ public class Main {
             
             int diffChoice = getValidInt(scanner, "Choice: ", 1, 3);
 
-            // Assigns difficulty modifier according to choice
+            // Assigns difficulty and starting stats according to choice
+            Player player;
             if (diffChoice == 1) {
                 difficulty = 0.5;
+                player = new Player(playerName, 30, 4);
             } else if (diffChoice == 3) {
                 difficulty = 1.5;
+                player = new Player(playerName, 25, 5);
             } else {
                 difficulty = 1.0;
+                player = new Player(playerName);
             }
 
+            // Monster for each floor (initializer list)
             Monster[] floors = {
                 new Monster("Goblin Runt", 15.0, 4, 10.0),
                 new Monster("Cave Spider", 30.0, 7, 25.0),
@@ -72,8 +122,12 @@ public class Main {
                 new Monster("Stone Golem", 80.0, 16, 70.0),
                 new Monster("Tower Golem", 130.0, 24, 150.0)
             };
+            // Per-floor stats for the run report
             int[] turnsPerFloor = new int[floors.length];
             double[] damageTaken = new double[floors.length];
+            boolean[] cleared = new boolean[floors.length];
+            // Total EXP earned, shown as the score
+            double totalExp = 0.0;
 
             // Loop iterating through tower levels 1 to 5
             for (int level = 1; level <= floors.length; level++) {
@@ -84,6 +138,7 @@ public class Main {
 
                 // Generates floor monster and prints entrance message
                 Monster monster = floors[level - 1];
+                // Revives a defeated monster if returning after fleeing
                 if (!monster.isAlive()) {
                     monster.setHealth(monster.getMaxHealth());
                 }
@@ -102,29 +157,33 @@ public class Main {
                     System.out.println("1. Attack");
                     System.out.println("2. Analyze");
                     System.out.println("3. Flee");
+                    System.out.println("4. Drink Potion");
 
-                    int combatChoice = getValidInt(scanner, "Combat Choice: ", 1, 3);
+                    int combatChoice = getValidInt(scanner, "Combat Choice: ", 1, 4);
+                    // No potions means no turn is used
+                    if (combatChoice == 4 && player.findItemSlot(Item.potion) == -1) {
+                        System.out.println("You don't have any potions!");
+                        continue;
+                    }
                     turnsPerFloor[level - 1]++;
 
                     // Option 1: Player attacks monster; monster counterattacks if alive
                     if (combatChoice == 1) {
-                        monster.takeDmg(player.getStrength());
-                        System.out.println(player.getName() + " hit " + monster.getName() + " for " + player.getStrength() + " damage!");
+                        monster.takeDmg(player.getAttack());
+                        System.out.println(player.getName() + " hit " + monster.getName() + " for " + player.getAttack() + " damage!");
 
                         if (monster.isAlive()) {
-                            player.takeDmg(monster.getAttack());
-                            damageTaken[level - 1] += monster.getAttack();
+                            damageTaken[level - 1] += player.takeDmg(monster.getAttack());
                             System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
                         }
-                    // Option 2: Inspect stats. Design choice: analyzing uses up a turn, so the
-                    // monster strikes back -- information has a cost, like a real turn-based battle
+                    // Option 2: Inspect stats; monster strikes back
                     } else if (combatChoice == 2) {
                         System.out.println("[ANALYZE] " + player.playerStats() + String.format(" (%.1f%% HP)", player.healthPercent() * 100.0));
                         System.out.println("[ANALYZE] " + monster.monsterStats() + String.format(" | EXP Value: %.1f", monster.getExp()));
+                        System.out.println("[ANALYZE] " + player.inventoryString());
 
                         if (monster.isAlive()) {
-                            player.takeDmg(monster.getAttack());
-                            damageTaken[level - 1] += monster.getAttack();
+                            damageTaken[level - 1] += player.takeDmg(monster.getAttack());
                             System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
                         }
 
@@ -132,15 +191,34 @@ public class Main {
                     } else if (combatChoice == 3) {
                         if (Math.random() < 0.66) {
                             System.out.println(player.getName() + " successfully fled down the stairs!");
+                            // Fleeing costs a random item, or some HP if inventory is empty
+                            Item lost = player.loseRandomItem();
+                            if (lost != null) {
+                                System.out.println("In the rush, " + player.getName() + " dropped " + lost + "!");
+                            } else {
+                                double stumble = Math.min(player.getMaxHealth() * 0.15, player.getHealth() - 1);
+                                if (stumble > 0) {
+                                    damageTaken[level - 1] += player.takeDmg(stumble);
+                                    System.out.println(player.getName() + String.format(" tripped on the stairs and lost %.1f HP!", stumble));
+                                }
+                            }
                             fled = true;
                             level = Math.max(0, level - 2);
                         } else {
                             System.out.println(player.getName() + " failed to flee!");
                             if (monster.isAlive()) {
-                                player.takeDmg(monster.getAttack());
-                                damageTaken[level - 1] += monster.getAttack();
+                                damageTaken[level - 1] += player.takeDmg(monster.getAttack());
                                 System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
                             }
+                        }
+                    // Option 4: Drink a potion; monster strikes back
+                    } else if (combatChoice == 4) {
+                        Item potion = player.drinkPotion();
+                        System.out.println(player.getName() + " drank a " + potion + "! " + player.playerStats());
+
+                        if (monster.isAlive()) {
+                            damageTaken[level - 1] += player.takeDmg(monster.getAttack());
+                            System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
                         }
                     }
                 }
@@ -152,12 +230,28 @@ public class Main {
 
                 System.out.println("\nVictory! Defeated " + monster.getName() + "!");
 
+                // First clear gives EXP and a chance at an item
+                if (!cleared[level - 1]) {
+                    cleared[level - 1] = true;
+                    totalExp += monster.getExp();
+                    System.out.println(String.format("+%.1f EXP (Score: %.1f)", monster.getExp(), totalExp));
+                    if (Math.random() < 0.6) {
+                        Item drop = Item.randomDrop(level);
+                        if (player.addItem(drop)) {
+                            System.out.println(monster.getName() + " dropped " + drop + "!");
+                        } else {
+                            System.out.println(monster.getName() + " dropped " + drop + ", but your inventory is full.");
+                        }
+                    }
+                }
+
                 // Post-combat room choice loop for floors 1 to 4
                 if (level < floors.length) {
                     boolean inRoomPhase = true;
                     while (inRoomPhase && player.isAlive() && keepPlaying) {
                         System.out.println("\n--- POST-COMBAT CHAMBER (Floor " + level + " Cleared) ---");
                         System.out.println(player.playerStats());
+                        System.out.println(player.inventoryString());
                         System.out.println("1. Train Room");
                         System.out.println("2. Rest Room");
                         System.out.println("3. Fight Room (Ascend)");
@@ -191,14 +285,16 @@ public class Main {
                 }
             }
 
-            // End-of-run screen: victory if all 5 levels cleared while alive, otherwise game over
+            // Victory or game over screen
             if (player.isAlive()) {
                 System.out.println("\nCongratulations " + player.getName() + "! You cleared all 5 levels of the tower!");
             } else {
                 System.out.println("\nGame Over </3");
             }
 
-            // Play-again prompt now lives in Main and uses main's Scanner
+            printRunReport(player, turnsPerFloor, damageTaken, totalExp);
+
+            // Asks to play again
             keepPlaying = askPlayAgain(scanner);
         }
         System.out.println("Thanks for playing!");
