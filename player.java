@@ -5,13 +5,14 @@ public class Player {
     private double maxHealth;
     private String name;
     private int strength;
-    
+    private Item[] inventory;
 
+    public static final int MAX_INVENTORY = 5;
+    
+    // Default constructor: this(...) calls the overloaded constructor below
+    // with the default starting stats (20 HP, 3 attack)
     public Player(String name) {
-        this.name = name;
-        this.health = 20.0;
-        this.strength = 3;
-        this.maxHealth = 20.0;
+        this(name, 20, 3);
     }
 
     // Overloaded constructor allowing custom max health and strength setup
@@ -20,6 +21,32 @@ public class Player {
         this.health = maxHealth;
         this.maxHealth = maxHealth;
         this.strength = strength;
+        this.inventory = new Item[MAX_INVENTORY];
+    }
+
+    public boolean addItem(Item item) {
+        for (int i = 0; i < inventory.length; i++) {
+            if (inventory[i] == null) {
+                inventory[i] = item;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Item getItem(int slot) {
+        if (slot >= 0 && slot < inventory.length) {
+            return inventory[slot];
+        }
+        return null;
+    }
+
+    public Item removeItem(int slot) {
+        Item removed = getItem(slot);
+        if (removed != null) {
+            inventory[slot] = null;
+        }
+        return removed;
     }
 
     // Heals the player based on difficulty settings, making sure health does not exceed max health

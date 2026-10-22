@@ -1,28 +1,10 @@
 import java.util.*;
 
-
 public class Main {
 
     // Class variables for overall game status and difficulty multiplier
     static boolean keepPlaying = true;
     static double difficulty = 1.0;
-    
-    // Returns a new Monster object based on current floor level
-    private static Monster spawnMonsterForLevel(int level) {
-
-        if (level == 1) 
-            return new Monster("Goblin Runt", 15.0, 4, 10.0);
-        if (level == 2) 
-            return new Monster("Cave Spider", 30.0, 7, 25.0);
-        if (level == 3) 
-            return new Monster("Orc Guard", 50.0, 11, 45.0);
-        if (level == 4) 
-            return new Monster("Stone Golem", 80.0, 16, 70.0);
-        if (level == 5) 
-            return new Monster("Tower Golem", 130.0, 24, 150.0); 
-        else
-             return new Monster("Zenon", 1000.0, 2, 9999.99);
-    }
     
     // Makes sure scanner doesn't error when getting incorrect values
     public static int getValidInt(Scanner scanner, String prompt) {
@@ -83,15 +65,28 @@ public class Main {
                 difficulty = 1.0;
             }
 
+            Monster[] floors = {
+                new Monster("Goblin Runt", 15.0, 4, 10.0),
+                new Monster("Cave Spider", 30.0, 7, 25.0),
+                new Monster("Orc Guard", 50.0, 11, 45.0),
+                new Monster("Stone Golem", 80.0, 16, 70.0),
+                new Monster("Tower Golem", 130.0, 24, 150.0)
+            };
+            int[] turnsPerFloor = new int[floors.length];
+            double[] damageTaken = new double[floors.length];
+
             // Loop iterating through tower levels 1 to 5
-            for (int level = 1; level <= 5; level++) {
+            for (int level = 1; level <= floors.length; level++) {
                 // Exits loop if player died or stopped playing
                 if (!player.isAlive() || !keepPlaying) {
                     break;
                 }
 
                 // Generates floor monster and prints entrance message
-                Monster monster = spawnMonsterForLevel(level);
+                Monster monster = floors[level - 1];
+                if (!monster.isAlive()) {
+                    monster.setHealth(monster.getMaxHealth());
+                }
                 System.out.println("\n============================");
                 System.out.println("   ENTERING TOWER LEVEL " + level);
                 System.out.println("============================");
@@ -109,6 +104,7 @@ public class Main {
                     System.out.println("3. Flee");
 
                     int combatChoice = getValidInt(scanner, "Combat Choice: ", 1, 3);
+                    turnsPerFloor[level - 1]++;
 
                     // Option 1: Player attacks monster; monster counterattacks if alive
                     if (combatChoice == 1) {
@@ -117,6 +113,7 @@ public class Main {
 
                         if (monster.isAlive()) {
                             player.takeDmg(monster.getAttack());
+                            damageTaken[level - 1] += monster.getAttack();
                             System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
                         }
                     // Option 2: Inspect stats. Design choice: analyzing uses up a turn, so the
@@ -127,6 +124,7 @@ public class Main {
 
                         if (monster.isAlive()) {
                             player.takeDmg(monster.getAttack());
+                            damageTaken[level - 1] += monster.getAttack();
                             System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
                         }
 
@@ -140,6 +138,7 @@ public class Main {
                             System.out.println(player.getName() + " failed to flee!");
                             if (monster.isAlive()) {
                                 player.takeDmg(monster.getAttack());
+                                damageTaken[level - 1] += monster.getAttack();
                                 System.out.println(monster.getName() + " struck back for " + monster.getAttack() + " damage!");
                             }
                         }
@@ -154,7 +153,7 @@ public class Main {
                 System.out.println("\nVictory! Defeated " + monster.getName() + "!");
 
                 // Post-combat room choice loop for floors 1 to 4
-                if (level < 5) {
+                if (level < floors.length) {
                     boolean inRoomPhase = true;
                     while (inRoomPhase && player.isAlive() && keepPlaying) {
                         System.out.println("\n--- POST-COMBAT CHAMBER (Floor " + level + " Cleared) ---");
