@@ -83,6 +83,7 @@ public class Main {
         System.out.println("Items dropped (all games): " + Item.getItemsCreated());
         System.out.println("==================================");
     }
+// STYLE:printing a line of equal signs makes the games announcment clear and easy to read
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -100,6 +101,7 @@ public class Main {
             System.out.println("3. Hard (1.5x)");
             
             int diffChoice = getValidInt(scanner, "Choice: ", 1, 3);
+// SUGGESTION:maybe make difficulty affect the strenght of enemies as well and the odds to get items from a victory
 
             // Assigns difficulty and starting stats according to choice
             Player player;
@@ -113,7 +115,7 @@ public class Main {
                 difficulty = 1.0;
                 player = new Player(playerName);
             }
-
+// PRAISE: I like the use of a variety of monsters with a variety of stats
             // Monster for each floor (initializer list)
             Monster[] floors = {
                 new Monster("Goblin Runt", 15.0, 4, 10.0),

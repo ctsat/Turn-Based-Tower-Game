@@ -29,7 +29,7 @@ public class Item {
     public static int getItemsCreated() {
         return itemsCreated;
     }
-
+// PRAISE: I like the use of math.random to create a chance to get an item that adds variety to the gameplay - Akaran T.
     // Makes a random item for a floor (static). Pre: level >= 1. Post: returns new Item
     public static Item randomDrop(int level) {
         if (Math.random() < 0.5) {

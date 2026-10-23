@@ -6,7 +6,7 @@ public class Player {
     private String name;
     private int strength;
     private Item[] inventory;
-
+// PRAISE: I like the use of an array to store all the items in the inventory instead of keeping them seperate
     // static: inventory size is the same for every player
     public static final int MAX_INVENTORY = 5;
     
@@ -14,7 +14,7 @@ public class Player {
     public Player(String name) {
         this(name, 20, 3);
     }
-
+// SUGGESTION:Maybe add a choice to create a custom player that calls this overlaoded constructor - Akaran
     // Overloaded constructor allowing custom max health and strength setup
     public Player(String name, int maxHealth, int strength) {
         this.name = name;
@@ -83,7 +83,7 @@ public class Player {
         }
         return total;
     }
-
+//QUESTION When would finding the strongest weapon be needed?
     // Returns the strongest weapon, or null if none
     public Item findStrongestWeapon() {
         Item best = null;

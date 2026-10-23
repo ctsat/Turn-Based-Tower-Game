@@ -1,0 +1,18 @@
+PLANNING NOTES (Unit 5-6 extension)
+Theme: a 5-floor turn-based tower climb. The player fights one monster per floor,
+then picks a room (train, rest, or ascend) before the next floor.
+
+New class: Item (weapon or potion). Monsters drop items when defeated.
+    Weapons add to the player's attack, potions heal during combat.
+Class relationship: Player HAS an Item[] inventory and takes Item objects as
+    parameters (addItem). Main creates Monsters and Items and passes them around.
+Arrays:
+    Monster[] floors = { ... }          initializer list, array of objects
+    Item[] inventory = new Item[5]      new Type[size], array of objects
+    int[] turnsPerFloor, double[] damageTaken, boolean[] cleared   primitive arrays
+Static members: Item.itemsCreated, Item.randomDrop(), Player.MAX_INVENTORY,
+    Player.totalWeaponPower(), Main.averageVisited(), Main.sum()
+Algorithms: count (countItems), search (findItemSlot), max (findStrongestWeapon),
+    sum (totalWeaponPower, sum), average (averageVisited)
+Unit 1-4 fixes: one shared Scanner, menu range checks, fleeing now costs an item or HP,
+    exp is earned as a score, second Player constructor used for difficulty stats.
